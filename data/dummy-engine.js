@@ -133,7 +133,7 @@ DummyFormFiller = (function() {
 			break;
 		case DummyPurposeEnum.YEAR_PURPOSE:
 			var yearLimits = getOrCreateMinAndMaxLimits(DummyPurposeEnum.YEAR_PURPOSE, $input);
-			$input.val(_generator.getDummyNumber(yearLimits));
+			//$input.val(_generator.getDummyNumber(yearLimits));
 			break;
 		case DummyPurposeEnum.UNDEFINED_PURPOSE:
 		default:
@@ -145,9 +145,13 @@ DummyFormFiller = (function() {
 	 * Populates given input with random date. Considers: - min and max properties
 	 */
 	function populateWithRandomDateWisely($input, inputPurpose) {
-		var limits = defineLimits($input);
-		var yearLimits = getOrCreateMinAndMaxLimits(YEAR_PURPOSE, limits);
+		limits = getOrCreateMinAndMaxLimits(DummyPurposeEnum.YEAR_PURPOSE, $input);
 		var date;
+
+        if (limits.max && limits.min && (new Date(min) > new Date(max))) {
+           return;
+        }
+
 		while (true) {
 			date = chance.date();
 			if ((!(MAX_LIMIT in limits) || date <= new Date(limits[MAX_LIMIT])) && (!(MIN_LIMIT in limits) || date >= new Date(limits[MIN_LIMIT]))) {
@@ -179,8 +183,8 @@ DummyFormFiller = (function() {
 			min = 21;
 			max = 75;
 		} else if (DummyPurposeEnum.YEAR_PURPOSE === purpose) {
-			min = 1940;
-			max = 2015;
+			min = "1940-01-01";
+			max = "2015-12-31";
 		}
 
 		if (limits.min == null && limits.max == null) {
@@ -276,6 +280,74 @@ DummyFormFiller = (function() {
 		});
 
 		return anyInputChecked;
+	}
+
+	/**
+	 * Returns an array of limits, i.e.: - min/max length - min/max value
+	 */
+	function defineLimits($element) {
+		var limits = {};
+		var minlength = $element.attr('minlength');
+		var maxlength = $element.attr('maxlength');
+		var min = $element.attr('min');
+		var max = $element.attr('max');
+
+		if (minlength) {
+			limits[MINLENGTH_LIMIT] = minlength;
+		}
+		if (maxlength) {
+			limits[MAXLENGTH_LIMIT] = maxlength;
+		}
+		if (min) {
+			limits[MIN_LIMIT] = min;
+		}
+		if (max) {
+			limits[MAX_LIMIT] = max;
+		}
+
+		logInfo($element, 'limits', limits);
+
+		return limits;
+	}
+
+	/**
+	 * Considers: - min and max properties - name and label to guess input's
+	 * role, e.g. age, year
+	 */
+	function defineInputPurpose($input) {
+		var purposeByLabel = defineInputPurposeByLabel($input);
+
+		if (typeof purposeByLabel !== UNDEFINED_PURPOSE) {
+			logInfo($input, 'purpose', purposeByLabel);
+			return purposeByLabel;
+		}
+
+		return UNDEFINED_PURPOSE;
+	}
+
+	function containsText(searchFor, inString) {
+		return inString.toLowerCase().indexOf(searchFor) >= 0;
+	}
+
+	/**
+	 * Considers label text: - phone - age - year
+	 */
+	function defineInputPurposeByLabel($input) {
+		var labelText = '';
+
+		if ($input.prop('id')) {
+			labelText = $('label[for="' + $input.prop('id') + '"]').text();
+		}
+
+		if (containsText('phone', labelText)) {
+			return PHONE_PURPOSE;
+		} else if (containsText('age', labelText)) {
+			return AGE_PURPOSE;
+		} else if (containsText('year', labelText)) {
+			return YEAR_PURPOSE;
+		}
+
+		return UNDEFINED_PURPOSE;
 	}
 
 	function findInputsByTypeAndName($here, type, name) {
