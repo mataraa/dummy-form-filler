@@ -145,20 +145,10 @@ DummyFormFiller = (function() {
 	 * Populates given input with random date. Considers: - min and max properties
 	 */
 	function populateWithRandomDateWisely($input, inputPurpose) {
-		limits = getOrCreateMinAndMaxLimits(DummyPurposeEnum.YEAR_PURPOSE, $input);
-		var date;
-
-        if (limits.max && limits.min && (new Date(min) > new Date(max))) {
-           return;
-        }
-
-		while (true) {
-			date = chance.date();
-			if ((!(MAX_LIMIT in limits) || date <= new Date(limits[MAX_LIMIT])) && (!(MIN_LIMIT in limits) || date >= new Date(limits[MIN_LIMIT]))) {
-				$input.val(date.toISOString().split('T')[0]);
-				break;
-			}
-		}
+		var limits = defineLimits($input);
+		var yearLimits = getOrCreateMinAndMaxLimits(YEAR_PURPOSE, limits);
+		var date = chance.date({min: MIN_LIMIT in limits ? new Date(limits[MIN_LIMIT]) : undefined, max: MAX_LIMIT in limits ? new Date(limits[MAX_LIMIT]) : undefined});
+		$input.val(date.toISOString().split('T')[0]);
 	}
 	
 	/*
