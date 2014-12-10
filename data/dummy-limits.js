@@ -1,18 +1,18 @@
 var Limits = {};
 
 Limits = (function() {
-	var limits = {};
 
-	limits.minlength = null;
-	limits.maxlength = null;
-	limits.min = null;
-	limits.max = null;
+	minlength = null;
+	maxlength = null;
+	min = null;
+	max = null;
 
-	return limits;
+	return this;
 });
 
 Limits.readLimits = function($element) {
     var limits = new Limits();
+
     var minlength = $element.attr('minlength');
     var maxlength = $element.attr('maxlength');
     var min = $element.attr('min');

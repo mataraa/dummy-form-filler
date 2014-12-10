@@ -6,6 +6,7 @@ DummyFormFiller = (function() {
 
 	engine.populateDummyData = function() {
         _generator = new DummyGenerator();
+        _semiotician = new DummySemiotician();
 
 		var $here = $('html');
 
@@ -49,7 +50,7 @@ DummyFormFiller = (function() {
 				excludedNames.push(groupName);
 			}
 		} else if ($element.is('[type=password]') && isEmptyVisibleAndEnabled($element)) {
-			$element.val("0Pa$$4uM^t3");
+            $element.val(_generator.getDummyPassword());
 		} else if ($element.is('select') && isEmptyVisibleAndEnabled($element)) {
 				clickRandomOptionOrOptions($element);
 		} else if ($element.is('[type=number]') && isEmptyVisibleAndEnabled($element)) {
@@ -101,7 +102,7 @@ DummyFormFiller = (function() {
 	 * label to guess input's role, e.g. age, year
 	 */
 	function populateWithRandomTextWisely($input) {
-		var inputPurpose = defineInputPurpose($input);
+		var inputPurpose = _semiotician.defineInputPurpose($input);
 
 		switch (inputPurpose) {
 		case DummyPurposeEnum.PHONE_PURPOSE:
@@ -120,7 +121,7 @@ DummyFormFiller = (function() {
 	 * properties - name and label to guess input's role, e.g. age, year
 	 */
 	function populateWithRandomNumberWisely($input, inputPurpose) {
-		inputPurpose = (typeof inputPurpose !== 'undefined') ? inputPurpose : defineInputPurpose($input);
+		inputPurpose = (typeof inputPurpose !== 'undefined') ? inputPurpose : _semiotician.defineInputPurpose($input);
 
 		switch (inputPurpose) {
 		case DummyPurposeEnum.PHONE_PURPOSE:
@@ -259,46 +260,6 @@ DummyFormFiller = (function() {
 		});
 
 		return anyInputChecked;
-	}
-
-	/**
-	 * Considers: - min and max properties - name and label to guess input's
-	 * role, e.g. age, year
-	 */
-	function defineInputPurpose($input) {
-		var purposeByLabel = defineInputPurposeByLabel($input);
-
-		if (typeof purposeByLabel !== DummyPurposeEnum.UNDEFINED_PURPOSE) {
-			DummyLogger.logInfo($input, 'purpose', purposeByLabel);
-			return purposeByLabel;
-		}
-
-		return DummyPurposeEnum.UNDEFINED_PURPOSE;
-	}
-
-	function containsText(searchFor, inString) {
-		return inString.toLowerCase().indexOf(searchFor) >= 0;
-	}
-
-	/**
-	 * Considers label text: - phone - age - year
-	 */
-	function defineInputPurposeByLabel($input) {
-		var labelText = '';
-
-		if ($input.prop('id')) {
-			labelText = $('label[for="' + $input.prop('id') + '"]').text();
-		}
-
-		if (containsText('phone', labelText)) {
-			return DummyPurposeEnum.PHONE_PURPOSE;
-		} else if (containsText('age', labelText)) {
-			return DummyPurposeEnum.AGE_PURPOSE;
-		} else if (containsText('year', labelText)) {
-			return DummyPurposeEnum.YEAR_PURPOSE;
-		}
-
-		return DummyPurposeEnum.UNDEFINED_PURPOSE;
 	}
 
 	function findInputsByTypeAndName($here, type, name) {

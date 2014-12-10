@@ -5,7 +5,6 @@
 var DummyGenerator = {};
 
 DummyGenerator = (function() {
-    var generator = {};
 
 	var DEI_KOBOL = 'Dei Kobol una apita uthoukarana ' + 'Ukthea mavatha gaman kerimuta '
 			+ 'Obe satharane mua osavathamanabanta ' + 'Api obata yagnya karama'
@@ -15,7 +14,7 @@ DummyGenerator = (function() {
 
 	var DUMMY_EMAIL = chance.email();
 
-	generator.getDummyNumber = function(limits) {
+	this.getDummyNumber = function(limits) {
 		if (limits == null) {
 			return chance.natural({
 				max : 500
@@ -31,7 +30,7 @@ DummyGenerator = (function() {
 		});
 	}
 
-	 generator.getDummyText = function(limits) {
+	 this.getDummyText = function(limits) {
 	    var text = '';
 		    console.log("ff: " + limits);
 
@@ -56,19 +55,23 @@ DummyGenerator = (function() {
 		return chance.capitalize(text);
 	}
 
-	generator.getDummyPhone = function(limits) {
+	this.getDummyPhone = function(limits) {
 		return chance.phone({
 			formatted : false
 		});
 	}
 
-	generator.getDummyEmail = function() {
+	this.getDummyEmail = function() {
 		return DUMMY_EMAIL;
 	}
 
-	generator.getDummyDomain = function() {
+	this.getDummyDomain = function() {
 		return chance.domain();
 	}
 
-	return generator;
+	this.getDummyPassword = function() {
+		return "0Pa$$4uM^t3";
+	}
+
+	return this;
 });
