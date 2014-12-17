@@ -73,5 +73,17 @@ DummyGenerator = (function() {
 		return "0Pa$$4uM^t3";
 	}
 
+	this.getDummyDate = function(limits) {
+
+	if (typeof purposeByLabel !== undefined) {
+
+    }
+		var date = chance.date({
+		    min: new Date(limits.min),
+		    max: new Date(limits.max)
+		});
+		return date.toISOString().split('T')[0];
+	}
+
 	return this;
 });
